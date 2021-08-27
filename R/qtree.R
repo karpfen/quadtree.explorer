@@ -1,8 +1,3 @@
-# Checks if cutoff criterion is met
-check_qt_tile <- function (qtree, dat_tile)
-{
-}
-
 get_parent_index <- function (level)
 {
   n_tiles_current <- 4^level
@@ -31,10 +26,15 @@ get_parent_index <- function (level)
 #' @param max_level Deepest level of the quadtree structure.
 #' @param force_quadratic Should the bounding box of the data be extended to be
 #' quadratic?
+#' @param cutoff_function Custom function that defines a cutoff criteria. Must
+#' return a boolean value.
 #' @import sf
 #' @export
-build_quadtree <- function (dat_in, max_level, force_quadratic = TRUE)
+build_quadtree <- function (dat_in, max_level, force_quadratic = TRUE,
+                            cutoff_function)
 {
+  cells_out <- vector (mode = "list", length = 4^max_level)
+
   bb <- sf::st_bbox (dat_in)
   if (force_quadratic)
   {
@@ -91,21 +91,42 @@ build_quadtree <- function (dat_in, max_level, force_quadratic = TRUE)
 
 
         dat_parent <- dat_in [parent_ids, ]
-#        if (check_qt_tile (dat_parent))
-#        {
-#        }
-
-        bb_j_contains <- sf::st_within (dat_parent, sf::st_as_sfc (bb_j))
+        bbj_sf <- sf::st_as_sfc (bb_j)
+        bb_j_contains <- sf::st_within (dat_parent, bbj_sf)
         bb_j_contains <- !is.na (as.numeric (bb_j_contains))
 
         updatable_rows <- rep (TRUE, l_dat_in)
         if (i > 1)
           updatable_rows <- indices [, i - 1] == parent_id
 
-        indices [which (updatable_rows) [bb_j_contains], i] <- tile_counter
+        terminate <- FALSE
+        if (!missing (cutoff_function) & any (bb_j_contains))
+        {
+          terminate <- cutoff_function (dat_in [updatable_rows, ])
+        }
+        sign <- ifelse (terminate, -1, 1)
+
+        if (terminate | (i == max_level))
+        {
+          if (length (which (bb_j_contains)) > 0)
+          {
+            cell_id <- which (sapply (cells_out, is.null)) [1]
+            bbj_sf <- sf::st_sf (bbj_sf)
+            bbj_sf$level <- i
+            bbj_sf$terminate <- terminate
+            cells_out [[cell_id]] <- bbj_sf
+          }
+        }
+
+        indices [which (updatable_rows) [bb_j_contains], i] <- tile_counter * sign
         tile_counter <- tile_counter + 1
       }
     }
   }
-  return (indices)
+
+  res <- list ()
+  res$index <- indices
+  cells_out <- do.call (rbind, cells_out)
+  res$cells <- cells_out
+  return (res)
 }

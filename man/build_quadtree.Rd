@@ -4,7 +4,7 @@
 \alias{build_quadtree}
 \title{Builds the index structure based on the input data.}
 \usage{
-build_quadtree(dat_in, max_level, force_quadratic = TRUE)
+build_quadtree(dat_in, max_level, force_quadratic = TRUE, cutoff_function)
 }
 \arguments{
 \item{dat_in}{A \code{sf} point object.}
@@ -13,6 +13,9 @@ build_quadtree(dat_in, max_level, force_quadratic = TRUE)
 
 \item{force_quadratic}{Should the bounding box of the data be extended to be
 quadratic?}
+
+\item{cutoff_function}{Custom function that defines a cutoff criteria. Must
+return a boolean value.}
 }
 \description{
 Builds the index structure based on the input data.
