@@ -1,11 +1,12 @@
 Package: quadtree.explorer
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Splits spatial data into smaller regions until a cutoff criterion is met
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: Andreas Petutschnig
+Maintainer: Andreas Petutschnig <andreas@petutschnig.de>
+Description: Can be used to check if and where a dataset meets given requirements for analysis.
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
+RoxygenNote: 7.1.1
+Depends: sf

@@ -25,10 +25,17 @@ get_parent_index <- function (level)
   return (parent_index)
 }
 
-# Builds the index structure based on the input data.
+#' Builds the index structure based on the input data.
+#'
+#' @param dat_in A \code{sf} point object.
+#' @param max_level Deepest level of the quadtree structure.
+#' @param force_quadratic Should the bounding box of the data be extended to be
+#' quadratic?
+#' @import sf
+#' @export
 build_quadtree <- function (dat_in, max_level, force_quadratic = TRUE)
 {
-  bb <- st_bbox (dat_in)
+  bb <- sf::st_bbox (dat_in)
   if (force_quadratic)
   {
     diffx <- as.numeric (abs (diff (bb [c (1, 3)])))
@@ -88,7 +95,7 @@ build_quadtree <- function (dat_in, max_level, force_quadratic = TRUE)
 #        {
 #        }
 
-        bb_j_contains <- st_within (dat_parent, st_as_sfc (bb_j))
+        bb_j_contains <- sf::st_within (dat_parent, sf::st_as_sfc (bb_j))
         bb_j_contains <- !is.na (as.numeric (bb_j_contains))
 
         updatable_rows <- rep (TRUE, l_dat_in)
