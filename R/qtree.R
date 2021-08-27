@@ -62,7 +62,6 @@ build_quadtree <- function (dat_in, max_level, force_quadratic = TRUE,
     max_tiles <- 4^i
     n_tiles_parent <- 4^(i - 1)
 
-    # define tile outlines
     diffx_i <- as.numeric (abs (diff (bb [c (1, 3)]))) / sqrt (max_tiles)
     diffy_i <- as.numeric (abs (diff (bb [c (2, 4)]))) / sqrt (max_tiles)
 
